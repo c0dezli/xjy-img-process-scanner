@@ -10,11 +10,46 @@
 </template>
 
 <script>
+import scheduler from "./libs/scheduler";
 import SideBar from "./components/Sidebar";
 
 export default {
   name: "xjy-img-process-printer",
-  components: { SideBar }
+  components: { SideBar },
+
+  async created() {
+    // Create all the settings at once
+
+    // scanner_id
+    const scanner_id = await this.$db.findOne({ key: "scanner_id" });
+    if (!scanner_id) {
+      await this.$db.insert({ value: "", key: "scanner_id" });
+    }
+
+    // school_name
+    const school_name = await this.$db.findOne({ key: "school_name" });
+    if (!school_name) {
+      await this.$db.insert({ value: "", key: "school_name" });
+    }
+
+    // folder_path
+    let folder_path = await this.$db.findOne({ key: "folder_path" });
+    if (!folder_path) {
+      await this.$db.insert({ value: "", key: "folder_path" });
+    } else {
+      folder_path = folder_path.value;
+      // if have folder_path, then start the scheduler
+      scheduler(folder_path);
+    }
+
+    // scan_qr_code_local
+    const scan_qr_code_local = await this.$db.findOne({
+      key: "scan_qr_code_local"
+    });
+    if (!scan_qr_code_local) {
+      await this.$db.insert({ value: true, key: "scan_qr_code_local" });
+    }
+  }
 };
 </script>
 

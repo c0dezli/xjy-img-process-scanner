@@ -65,6 +65,20 @@
               <x-label>修改</x-label>
             </x-button>
           </div>
+          <div class="item">
+            <div class="name">是否在本地识别二维码:</div>
+            <div class="value">
+              {{ scan_qr_code_local ? "是" : "否" }}
+            </div>
+
+            <x-button
+              @click="changeScanQrCodeLocal"
+              skin="condensed"
+              class="change-button"
+            >
+              <x-label>修改</x-label>
+            </x-button>
+          </div>
         </div>
       </x-card>
     </article>
@@ -82,6 +96,7 @@ export default {
       scanner_id_change: false,
       school_name: "",
       school_name_change: false,
+      scan_qr_code_local: "",
       folder_path: ""
     };
   },
@@ -128,25 +143,21 @@ export default {
       }
     },
 
+    async changeScanQrCodeLocal() {
+      await this.$db.update(
+        { key: "scan_qr_code_local" },
+        { value: !this.scan_qr_code_local, key: "scan_qr_code_local" }
+      );
+      await this.refreshValue();
+    },
+
     async refreshValue() {
-      this.scanner_id = await this.$db.findOne({ key: "scanner_id" });
-      if (!this.scanner_id) {
-        await this.$db.insert({ value: "", key: "scanner_id" });
-      } else {
-        this.scanner_id = this.scanner_id.value;
-      }
-      this.school_name = await this.$db.findOne({ key: "school_name" });
-      if (!this.school_name) {
-        await this.$db.insert({ value: "", key: "school_name" });
-      } else {
-        this.school_name = this.school_name.value;
-      }
-      this.folder_path = await this.$db.findOne({ key: "folder_path" });
-      if (!this.folder_path) {
-        await this.$db.insert({ value: "", key: "folder_path" });
-      } else {
-        this.folder_path = this.folder_path.value;
-      }
+      this.scanner_id = (await this.$db.findOne({ key: "scanner_id" })).value;
+      this.school_name = (await this.$db.findOne({ key: "school_name" })).value;
+      this.folder_path = (await this.$db.findOne({ key: "folder_path" })).value;
+      this.scan_qr_code_local = (
+        await this.$db.findOne({ key: "scan_qr_code_local" })
+      ).value;
     }
   }
 };
