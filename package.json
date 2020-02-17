@@ -1,6 +1,6 @@
 {
   "name": "xjy-img-process-printer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "author": "XiangL5 <xiangl5@andrew.cmu.edu>",
   "description": "An electron-vue project",
   "license": null,
@@ -52,14 +52,11 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "canvas": "^2.6.1",
     "child_process": "^1.0.2",
     "chokidar": "^3.3.1",
     "form-data": "^3.0.0",
-    "image-clipper": "^0.4.4",
     "jimp": "^0.9.3",
     "jpeg-js": "^0.3.6",
-    "jsqr": "^1.2.0",
     "mozjpeg": "^6.0.1",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
