@@ -1,23 +1,16 @@
-import { API_ROOT } from '@/config';
-import axios from 'axios';
+import axios from "axios";
 
 // Send a GET request to URL and return the json from the server.
-export async function get(
-  url,
-  params,
-  headers,
-  options
-) {
+export async function get(url, params, headers, options) {
   try {
     const response = await axios({
-      method: 'get',
-      url: `${url}`,
+      method: "get",
+      url: url,
       params,
       headers: {
-        Authorization: `JWT ${store.getters.userToken}`,
-        ...headers,
+        ...headers
       },
-      ...options,
+      ...options
     });
     // Success 🎉
     return response;
@@ -42,7 +35,7 @@ export async function get(
       return error.request;
     } else {
       // Something happened in setting up the request and triggered an Error
-      console.log('Error', error.message);
+      console.log("Error", error.message);
       return error.message;
     }
   }
@@ -50,22 +43,16 @@ export async function get(
 
 // Send a POST request to URL with json DATA and return the json from the
 // server.
-export async function post(
-  url,
-  data,
-  headers,
-  options
-) {
+export async function post(url, data, headers, options) {
   try {
     const response = await axios({
-      method: 'post',
-      url: `${url}`,
+      method: "post",
+      url: url,
       data,
       headers: {
-        Authorization: `JWT ${store.getters.userToken}`,
-        ...headers,
+        ...headers
       },
-      ...options,
+      ...options
     });
     // Success 🎉
     return response;
@@ -90,7 +77,7 @@ export async function post(
       return error.request;
     } else {
       // Something happened in setting up the request and triggered an Error
-      console.log('Error', error.message);
+      console.log("Error", error.message);
       return error.message;
     }
   }
@@ -98,22 +85,16 @@ export async function post(
 
 // Send a PUT request to URL with json DATA and return the json from the
 // server.
-export async function patch(
-  url,
-  data,
-  headers,
-  options
-) {
+export async function patch(url, data, headers, options) {
   try {
     const response = await axios({
-      method: 'patch',
-      url: `${url}`,
+      method: "patch",
+      url: url,
       data,
       headers: {
-        Authorization: `JWT ${store.getters.userToken}`,
-        ...headers,
+        ...headers
       },
-      ...options,
+      ...options
     });
     // Success 🎉
     return response;
@@ -138,7 +119,7 @@ export async function patch(
       return error.request;
     } else {
       // Something happened in setting up the request and triggered an Error
-      console.log('Error', error.message);
+      console.log("Error", error.message);
       return error.message;
     }
   }
@@ -148,13 +129,12 @@ export async function patch(
 export async function del(url, headers, options) {
   try {
     const response = await axios({
-      method: 'delete',
-      url: `${url}`,
+      method: "delete",
+      url: url,
       headers: {
-        Authorization: `JWT ${store.getters.userToken}`,
-        ...headers,
+        ...headers
       },
-      ...options,
+      ...options
     });
     // Success 🎉
     return response;
@@ -179,12 +159,8 @@ export async function del(url, headers, options) {
       return error.request;
     } else {
       // Something happened in setting up the request and triggered an Error
-      console.log('Error', error.message);
+      console.log("Error", error.message);
       return error.message;
     }
   }
 }
-
-
-
-http://test.disc.xinjiaoyu.com/file-server/scannerUpload

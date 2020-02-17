@@ -5,7 +5,8 @@ const mozjpeg = require("mozjpeg");
 // const makeDir = require("make-dir");
 
 import db from "./datastore";
-import { scanQrCode } from "./qrcode";
+import { scanQRCode } from "./qrcode";
+import { uploadFile } from "./upload";
 
 /**
  * Generate new path to shrinked file
@@ -14,7 +15,7 @@ import { scanQrCode } from "./qrcode";
  */
 const generateNewPath = pathName => {
   let objPath = path.parse(pathName);
-  // objPath.dir = objPath.dir + "/minified";
+  // objPath.dir = objPath.dir + "/compressed";
   // makeDir.sync(objPath.dir);
 
   /** Suffix setting */
@@ -37,55 +38,84 @@ const getFileSize = file_path => {
 };
 
 /**
+ * Remove Uncompressed File
+ * @param  {string} origin_file_path Filepath
+ */
+const removeUncompressed = async origin_file_path => {
+  // 从数据库中查看是否保存未压缩文件
+  const keep_uncompressed = (await db.findOne({ key: "keep_uncompressed" }))
+    .value;
+
+  if (keep_uncompressed) return;
+
+  const file_name = path.parse(origin_file_path).name;
+
+  fs.unlink(origin_file_path, () => {});
+
+  console.log(`Removed uncompressed ${file_name}`);
+
+  await db.update(
+    { file_name: file_name },
+    { $set: { removed_original: true } },
+    { multi: false }
+  );
+};
+
+/**
  * Main Logic
  * @param  {string} file_path Filepath
  */
-export const compressFile = file_path => {
-  console.log(`Compressing ${file_path}`);
-  if (path.extname(file_path).toLowerCase() !== ".jpg") return;
+export const compressFile = origin_file_path => {
+  const origin_file_name = path.parse(origin_file_path).name;
+  console.log(`Compressing ${origin_file_name}`);
+
+  if (path.extname(origin_file_path).toLowerCase() !== ".jpg") return;
 
   /** Process image(s) */
-  fs.readFile(file_path, "utf8", (err, data) => {
+  fs.readFile(origin_file_path, "utf8", (err, data) => {
     if (err) throw err;
 
-    const minified_file = generateNewPath(file_path);
-    const origin_file = file_path;
+    const compressed_file_path = generateNewPath(origin_file_path);
 
-    execFile(mozjpeg, ["-outfile", minified_file, origin_file], async err => {
-      const minified_file_path_obj = path.parse(minified_file);
+    execFile(
+      mozjpeg,
+      ["-outfile", compressed_file_path, origin_file_path],
+      async err => {
+        const compressed_file_path_obj = path.parse(compressed_file_path);
+        // 压缩完成， 更新数据库，打印Log
+        console.log(`Compressed ${compressed_file_path_obj.name}`);
+        try {
+          await db.update(
+            {
+              file_name: compressed_file_path_obj.name.replace(".min", "")
+            },
+            {
+              $set: {
+                compressed: true,
+                compressed_file_name: compressed_file_path_obj.name,
+                compressed_file_path: compressed_file_path,
+                compressed_time: Date.now()
+              }
+            },
+            { multi: false }
+          );
+        } catch (error) {
+          console.log(
+            `Failed to update DB for ${origin_file_name}, the error message`,
+            error
+          );
+          // TODO: what should we do when update DB failed?
+        }
 
-      console.log(`Compressed ${minified_file_path_obj.name}`);
-      // Start Scan QR Code
-      try {
-        console.log(`Scanning QR Code in ${minified_file_path_obj.name}`);
-        const qr_code_result = await scanQrCode(minified_file);
-        console.log(`Find QR Code in ${minified_file_path_obj.name}`);
+        // 移除本地未压缩文件
+        await removeUncompressed(origin_file_path);
 
-        await db.update(
-          { compressed_file_name: minified_file_path_obj.name },
-          {
-            $set: {
-              qr_code: qr_code_result,
-              qr_code_scanned: true,
-              page: "A"
-            }
-          },
-          { multi: false }
-        );
-      } catch (error) {
-        await db.update(
-          { compressed_file_name: minified_file_path_obj.name },
-          {
-            $set: {
-              qr_code: null,
-              qr_code_scanned: true,
-              page: "B"
-            }
-          },
-          { multi: false }
-        );
-        console.log(`Failed to find QRCode in ${minified_file_path_obj.name}`);
+        // 扫描二维码
+        await scanQRCode(compressed_file_path);
+
+        // 上传文件
+        await uploadFile(compressed_file_path);
       }
-    });
+    );
   });
 };

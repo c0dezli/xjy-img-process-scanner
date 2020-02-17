@@ -1,11 +1,12 @@
+import path from "path";
 import chokidar from "chokidar";
+
 import db from "./datastore";
 import { compressFile } from "./compress";
-import { scanQrCode } from "./qrcode";
-const path = require("path");
+import { generateSchema } from "./json_schema";
 
-export default (wathPath, onAdd, onAddDir, onRemove, onRemoveDir, onError) => {
-  const watcher = chokidar.watch(wathPath, {
+export default watch_path => {
+  const watcher = chokidar.watch(watch_path, {
     ignored: /[\/\\]\./,
     persistent: true
   });
@@ -14,63 +15,29 @@ export default (wathPath, onAdd, onAddDir, onRemove, onRemoveDir, onError) => {
   const log = console.log.bind(console);
 
   function onWatcherReady() {
-    console.info(
-      "From here can you check for real changes, the initial scan has been completed."
-    );
+    console.info("INIT SCAN COMPLETED");
   }
 
   // Declare the listeners of the watcher
   watcher
     .on("add", async function(file_path) {
-      console.log("File", file_path, "has been added");
+      const file_name = path.parse(file_path).name;
 
-      const file_path_obj = path.parse(file_path);
-      const minified_file = file_path_obj.name.includes(".min");
+      const minified_file = file_name.includes(".min");
       const exist_in_db = await db.findOne({
-        $or: [
-          { file_name: file_path_obj.name },
-          { compressed_file_name: file_path_obj.name }
-        ]
+        $or: [{ file_name: file_name }, { compressed_file_name: file_name }]
       });
+
+      if (!exist_in_db) {
+        console.log("File", file_name, "has been added");
+      }
+
       // Orgin File Added
       if (!exist_in_db && !minified_file) {
-        const new_file_record = {
-          type: "file_record",
-          file_name: file_path_obj.name,
-          file_path: file_path,
-          compressed: false,
-          compressed_file_path: "",
-          compressed_file_name: "",
-          qr_code_scanned: false,
-          qr_code: "",
-          page: "",
-          uploaded: false,
-          createTime: Date.now()
-        };
+        const new_file_record = await generateSchema(file_name, file_path);
         await db.insert(new_file_record);
+        // 开始压缩文件
         compressFile(file_path);
-      }
-      // Minify File Added
-      else if (!exist_in_db && minified_file) {
-        try {
-          await db.update(
-            { file_name: file_path_obj.name.replace(".min", "") },
-            {
-              $set: {
-                compressed: true,
-                compressed_file_name: file_path_obj.name,
-                compressed_file_path: file_path
-              }
-            },
-            { multi: false }
-          );
-        } catch (error) {
-          console.log(
-            `Failed to update DB for ${file_path_obj.name}, the error message`,
-            error
-          );
-          // TODO: what should we do when update DB failed?
-        }
       }
     })
     // .on("addDir", function(path) {
@@ -80,10 +47,10 @@ export default (wathPath, onAdd, onAddDir, onRemove, onRemoveDir, onError) => {
     // .on("change", function(path) {
     //   console.log("File", path, "has been changed");
     // })
-    .on("unlink", function(path) {
-      console.log("File", path, "has been removed");
-      //   onRemove();
-    })
+    // .on("unlink", function(path) {
+    //   console.log("File", path, "has been removed");
+    //   //   onRemove();
+    // })
     // .on("unlinkDir", function(path) {
     //   console.log("Directory", path, "has been removed");
     //   //   onRemoveDir();

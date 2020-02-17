@@ -53,6 +53,14 @@ export default {
       if (!scan_qr_code_local) {
         await this.$db.insert({ value: true, key: "scan_qr_code_local" });
       }
+
+      // keep_uncompressed
+      const keep_uncompressed = await this.$db.findOne({
+        key: "keep_uncompressed"
+      });
+      if (!keep_uncompressed) {
+        await this.$db.insert({ value: true, key: "keep_uncompressed" });
+      }
     }
     // async
   }

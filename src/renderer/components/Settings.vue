@@ -79,6 +79,34 @@
               <x-label>修改</x-label>
             </x-button>
           </div>
+          <div class="item">
+            <div class="name">保留未压缩扫描件:</div>
+            <div class="value">
+              {{ keep_uncompressed ? "是" : "否" }}
+            </div>
+
+            <x-button
+              @click="changeKeepUncompressed"
+              skin="condensed"
+              class="change-button"
+            >
+              <x-label>修改</x-label>
+            </x-button>
+          </div>
+          <div class="item">
+            <div class="name">日志保留时间:</div>
+            <div class="value">
+              {{ scan_qr_code_local ? "是" : "否" }}
+            </div>
+
+            <x-button
+              @click="changeScanQrCodeLocal"
+              skin="condensed"
+              class="change-button"
+            >
+              <x-label>修改</x-label>
+            </x-button>
+          </div>
         </div>
       </x-card>
     </article>
@@ -97,7 +125,8 @@ export default {
       school_name: "",
       school_name_change: false,
       scan_qr_code_local: "",
-      folder_path: ""
+      folder_path: "",
+      keep_uncompressed: true
     };
   },
   async beforeMount() {
@@ -150,6 +179,13 @@ export default {
       );
       await this.refreshValue();
     },
+    async changeKeepUncompressed() {
+      await this.$db.update(
+        { key: "keep_uncompressed" },
+        { value: !this.keep_uncompressed, key: "keep_uncompressed" }
+      );
+      await this.refreshValue();
+    },
 
     async refreshValue() {
       this.scanner_id = (await this.$db.findOne({ key: "scanner_id" })).value;
@@ -157,6 +193,9 @@ export default {
       this.folder_path = (await this.$db.findOne({ key: "folder_path" })).value;
       this.scan_qr_code_local = (
         await this.$db.findOne({ key: "scan_qr_code_local" })
+      ).value;
+      this.keep_uncompressed = (
+        await this.$db.findOne({ key: "keep_uncompressed" })
       ).value;
     }
   }
