@@ -95,18 +95,32 @@
           </div>
           <div class="item">
             <div class="name">日志保留时间:</div>
-            <div class="value">
-              {{ scan_qr_code_local ? "是" : "否" }}
-            </div>
-
+            <div v-show="!keep_log_change" class="value">{{ keep_log }}</div>
+            <input
+              v-show="keep_log_change"
+              v-model="keep_log"
+              style="width:50px"
+            />
+            周
             <x-button
-              @click="changeScanQrCodeLocal"
+              @click="changeKeepLog"
               skin="condensed"
               class="change-button"
             >
-              <x-label>修改</x-label>
+              <x-label v-if="!keep_log_change">修改</x-label>
+              <x-label v-else>确定</x-label>
+            </x-button>
+            <x-button
+              v-if="keep_log_change"
+              skin="condensed"
+              class="change-button"
+            >
+              <x-label @click="keep_log_change = false">取消</x-label>
             </x-button>
           </div>
+          <h4 style="font-weight:500">Dev</h4>
+
+          <x-button @click="clearLog">清空日志</x-button>
         </div>
       </x-card>
     </article>
@@ -126,7 +140,9 @@ export default {
       school_name_change: false,
       scan_qr_code_local: "",
       folder_path: "",
-      keep_uncompressed: true
+      keep_uncompressed: true,
+      keep_log: 4,
+      keep_log_change: false
     };
   },
   async beforeMount() {
@@ -186,17 +202,35 @@ export default {
       );
       await this.refreshValue();
     },
+    async changeKeepLog() {
+      if (this.keep_log_change) {
+        await this.$db.update(
+          { key: "keep_log" },
+          { value: this.keep_log, key: "keep_log" }
+        );
+        await this.refreshValue();
+        this.keep_log_change = false;
+      } else {
+        this.keep_log_change = true;
+      }
+    },
 
     async refreshValue() {
       this.scanner_id = (await this.$db.findOne({ key: "scanner_id" })).value;
       this.school_name = (await this.$db.findOne({ key: "school_name" })).value;
       this.folder_path = (await this.$db.findOne({ key: "folder_path" })).value;
+      this.keep_log = (await this.$db.findOne({ key: "keep_log" })).value;
       this.scan_qr_code_local = (
         await this.$db.findOne({ key: "scan_qr_code_local" })
       ).value;
       this.keep_uncompressed = (
         await this.$db.findOne({ key: "keep_uncompressed" })
       ).value;
+    },
+    async clearLog() {
+      const DB = await this.$db.find({ type: "file_record" });
+      console.log(DB);
+      this.$db.remove({ type: "file_record" }, { multi: true });
     }
   }
 };

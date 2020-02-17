@@ -61,6 +61,14 @@ export default {
       if (!keep_uncompressed) {
         await this.$db.insert({ value: true, key: "keep_uncompressed" });
       }
+
+      // keep_log
+      const keep_log = await this.$db.findOne({
+        key: "keep_log"
+      });
+      if (!keep_log) {
+        await this.$db.insert({ value: 4, key: "keep_log" });
+      }
     }
     // async
   }

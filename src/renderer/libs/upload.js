@@ -17,7 +17,6 @@ const constractForm = async file_path => {
   const json_result = await db.findOne({
     compressed_file_name: file_path_obj.name
   });
-  console.log(JSON.stringify(json_result));
   const form_data = new FormData();
 
   form_data.append("file", file);

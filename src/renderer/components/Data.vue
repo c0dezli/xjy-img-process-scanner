@@ -5,33 +5,22 @@
       <h4 style="font-weight:500;margin-top:0">
         {{ Date().toString() }}
       </h4>
-      <x-button @click="compressImg">测试压缩文件</x-button>
-      <x-button @click="qrcode">测试QR Code</x-button>
       <x-card>
         <div class="items">
           <h4 style="font-weight:500">当前扫描任务</h4>
           <div class="item">
-            <div class="name">上传中:</div>
-            <div class="value">{{ name }}</div>
-          </div>
-          <div class="item">
-            <div class="name">上传文件名:</div>
-            <div class="value">{{ name }}</div>
-          </div>
-          <div class="item">
-            <div class="name">上传进度:</div>
-            <div class="value">{{ name }}</div>
+            <div class="value">{{ curr_log }}</div>
           </div>
           <br />
 
           <h4 style="font-weight:500">扫描统计</h4>
           <div class="item">
-            <div class="name">今日扫描数量:</div>
-            <div class="value">{{ path }}</div>
+            <div class="name">本机今日扫描数量:</div>
+            <div class="value">{{ scans_today }}</div>
           </div>
           <div class="item">
             <div class="name">本机共计扫描数量:</div>
-            <div class="value">{{ path }}</div>
+            <div class="value">{{ scans_total }}</div>
           </div>
           <div class="item">
             <div class="name">扫描文件所在文件夹:</div>
@@ -41,11 +30,11 @@
           <h4 style="font-weight:500">本机信息</h4>
           <div class="item">
             <div class="name">本机ID:</div>
-            <div class="value">{{ folder_path }}</div>
+            <div class="value">{{ scanner_id }}</div>
           </div>
           <div class="item">
             <div class="name">本机所属学校:</div>
-            <div class="value">{{ vue }}</div>
+            <div class="value">{{ school_name }}</div>
           </div>
         </div>
       </x-card>
@@ -62,49 +51,31 @@ import { scanQrCode } from "../libs/qrcode";
 
 export default {
   name: "data-page",
-  async beforeMount() {
-    this.folder_path = await this.$db.findOne({ key: "folder_path" });
-
-    if (!this.folder_path) {
-      await this.$db.insert({ value: "", key: "folder_path" });
-    } else {
-      this.folder_path = this.folder_path.value;
-    }
+  beforeMount() {
+    this.initValues();
   },
   data() {
     return {
-      electron: process.versions.electron,
-      name: this.$route.name,
-      node: process.versions.node,
-      path: remote.app.getPath("userData"),
-      platform: require("os").platform(),
-      vue: require("vue/package.json").version,
-      folder_path: "undefined"
+      scans_today: "",
+      scans_total: "",
+      folder_path: "",
+      scanner_id: "",
+      school_name: "",
+      curr_log: "无"
     };
   },
   methods: {
-    async compressImg() {
-      fs.readdir(this.folder_path, (err, dir) => {
-        for (let file_name of dir) {
-          console.log(file_name);
-          compressFile(`${this.folder_path}/${file_name}`);
-        }
-      });
-    },
-    async qrcode() {
-      fs.readdir(this.folder_path + "/minified", (err, dir) => {
-        for (let file_name of dir) {
-          if (file_name.split(".")[file_name.split(".").length - 1] === "jpg") {
-            console.log(file_name);
-
-            scanQrCode(`${this.folder_path}/minified/${file_name}`).then(
-              code => {
-                console.log(code);
-              }
-            );
-          }
-        }
-      });
+    async initValues() {
+      this.scanner_id = (await this.$db.findOne({ key: "scanner_id" })).value;
+      this.school_name = (await this.$db.findOne({ key: "school_name" })).value;
+      this.folder_path = (await this.$db.findOne({ key: "folder_path" })).value;
+      this.scans_today = (
+        await this.$db.find({
+          type: "file_record",
+          create_time: { $gte: Date.now() - 86400000 }
+        })
+      ).length;
+      this.scans_total = (await this.$db.find({ type: "file_record" })).length;
     }
   }
 };
