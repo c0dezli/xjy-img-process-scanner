@@ -17,7 +17,7 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "新教育平台 扫描仪配置 v1.0",
+    "productName": "新教育平台 扫描仪配置",
     "appId": "com.xinjiaoyu.xjy-img-process-scanner",
     "directories": {
       "output": "build"
