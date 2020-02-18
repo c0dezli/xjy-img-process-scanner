@@ -61,6 +61,7 @@
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.1",
     "qrcode-reader": "^1.0.4",
+    "regenerator-runtime": "^0.13.3",
     "vue": "^2.5.16",
     "vue-electron": "^1.0.6",
     "vue-router": "^3.0.1",
