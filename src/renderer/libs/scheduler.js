@@ -21,6 +21,8 @@ export default watch_path => {
   // Declare the listeners of the watcher
   watcher
     .on("add", async function(file_path) {
+      if (path.extname(file_path).toLowerCase() !== ".jpg") return;
+
       const file_name = path.parse(file_path).name;
 
       const minified_file = file_name.includes(".min");
