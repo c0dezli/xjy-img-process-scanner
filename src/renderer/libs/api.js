@@ -6,8 +6,8 @@ export default {
   // 用来向现有服务器上传图片的API
   async scannerUpload(form_data) {
     const res = await post(
-      // "http://test.disc.xinjiaoyu.com/file-server/scannerUpload",
-      "https://postman-echo.com/post",
+      "http://test.disc.xinjiaoyu.com/file-server/scannerUpload",
+      // "https://postman-echo.com/post",
       form_data
     );
     return res;
