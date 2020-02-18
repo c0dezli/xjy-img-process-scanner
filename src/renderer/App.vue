@@ -14,7 +14,7 @@ import scheduler from "./libs/scheduler";
 import SideBar from "./components/Sidebar";
 
 export default {
-  name: "xjy-img-process-printer",
+  name: "App",
   components: { SideBar },
 
   async created() {
@@ -37,13 +37,12 @@ export default {
       }
 
       // folder_path
-      let folder_path = await this.$db.findOne({ key: "folder_path" });
+      const folder_path = await this.$db.findOne({ key: "folder_path" });
       if (!folder_path) {
         await this.$db.insert({ value: "", key: "folder_path" });
-      } else {
-        folder_path = folder_path.value;
-        // if have folder_path, then start the scheduler
-        scheduler(folder_path);
+      } else if (folder_path.value) {
+        // if have folder_path and has value, then start the scheduler
+        scheduler(folder_path.value);
       }
 
       // scan_qr_code_local

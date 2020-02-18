@@ -17,8 +17,8 @@
     "postinstall": ""
   },
   "build": {
-    "productName": "xjy-img-process-printer",
-    "appId": "com.example.yourapp",
+    "productName": "新教育平台 扫描仪配置 v1.0",
+    "appId": "com.xinjiaoyu.xjy-img-process-scanner",
     "directories": {
       "output": "build"
     },
