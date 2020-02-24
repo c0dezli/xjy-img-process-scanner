@@ -1,9 +1,8 @@
 import fs from "fs";
-import FormData from "form-data";
 import path from "path";
 
 import db from "./datastore";
-import API from "./api";
+import apis from "./api";
 
 const constractForm = async file_path => {
   const file_path_obj = path.parse(file_path);
@@ -21,7 +20,6 @@ const constractForm = async file_path => {
 
   form_data.append("file", file);
   form_data.append("json", JSON.stringify(json_result));
-
   return form_data;
 };
 
@@ -31,7 +29,7 @@ export const uploadFile = async file_path => {
 
   try {
     // Upload file
-    await API.scannerUpload(form_data);
+    await apis.scannerUpload(form_data);
 
     // Log
     console.log("Uploaded", file_path);
@@ -50,10 +48,4 @@ export const uploadFile = async file_path => {
   } catch (err) {
     console.log(err);
   }
-
-  //   for (var i = 0; i < this.$refs.file.files.length; i++) {
-  //     let file = this.$refs.file.files[i];
-  //     console.log(file);
-  //     formData.append("files[" + i + "]", file);
-  //   }
 };
