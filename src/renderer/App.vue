@@ -68,8 +68,16 @@ export default {
       if (!keep_log) {
         await this.$db.insert({ value: 4, key: "keep_log" });
       }
+
+      // custom_api
+      const custom_api = await this.$db.findOne({
+        key: "custom_api"
+      });
+      if (!custom_api) {
+        await this.$db.insert({ value: "", key: "custom_api" });
+      }
     }
-    // async
+
   }
 };
 </script>
