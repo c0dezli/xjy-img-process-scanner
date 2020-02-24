@@ -16,7 +16,7 @@ export default new Router({
       component: require("@/components/Log").default
     },
     {
-      path: "/log/:id",
+      path: "/log-detail",
       name: "log-detail-page",
       component: require("@/components/LogDetail").default
     },
