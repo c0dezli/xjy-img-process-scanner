@@ -30,6 +30,12 @@ export default {
         await this.$db.insert({ value: "", key: "scanner_id" });
       }
 
+      // school_id
+      const school_id = await this.$db.findOne({ key: "school_id" });
+      if (!school_id) {
+        await this.$db.insert({ value: "", key: "school_id" });
+      }
+
       // school_name
       const school_name = await this.$db.findOne({ key: "school_name" });
       if (!school_name) {

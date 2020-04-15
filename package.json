@@ -1,9 +1,9 @@
 {
   "name": "xjy-img-process-scanner",
   "version": "1.0.0",
-  "author": "XiangL5 <xiangl5@andrew.cmu.edu>",
+  "author": "C0dezLee <c0dezlee@gmail.com>",
   "description": "An electron-vue project",
-  "license": null,
+  "license": "MIT",
   "main": "./dist/electron/main.js",
   "scripts": {
     "build": "node .electron-vue/build.js && electron-builder",

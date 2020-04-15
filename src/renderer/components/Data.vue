@@ -33,6 +33,10 @@
             <div class="value">{{ scanner_id }}</div>
           </div>
           <div class="item">
+            <div class="name">本机所属学校ID:</div>
+            <div class="value">{{ school_id }}</div>
+          </div>
+          <div class="item">
             <div class="name">本机所属学校:</div>
             <div class="value">{{ school_name }}</div>
           </div>
@@ -60,6 +64,7 @@ export default {
       scans_total: "",
       folder_path: "",
       scanner_id: "",
+      school_id: "",
       school_name: "",
       curr_log: "无"
     };
@@ -67,8 +72,9 @@ export default {
   methods: {
     async initValues() {
       this.scanner_id = (await this.$db.findOne({ key: "scanner_id" })).value;
-      this.school_name = (await this.$db.findOne({ key: "school_name" })).value;
+      this.school_id = (await this.$db.findOne({ key: "school_id" })).value;
       this.folder_path = (await this.$db.findOne({ key: "folder_path" })).value;
+      this.school_name = (await this.$db.findOne({ key: "school_name" })).value;
       this.scans_today = (
         await this.$db.find({
           type: "file_record",

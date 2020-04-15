@@ -8,10 +8,10 @@ export const generateSchema = async (file_name, file_path) => {
     })
   ).value;
 
-  // school_name
-  const school_name = (
+  // school_id
+  const school_id = (
     await db.findOne({
-      key: "school_name"
+      key: "school_id"
     })
   ).value;
 
@@ -36,6 +36,6 @@ export const generateSchema = async (file_name, file_path) => {
     uploaded_time: null,
 
     scanner_id: scanner_id,
-    school_name: school_name
+    school_id: school_id
   };
 };

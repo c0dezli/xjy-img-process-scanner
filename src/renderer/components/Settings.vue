@@ -15,16 +15,16 @@
             </x-button>
           </div>
           <div class="item">
-            <div class="name">本机所属学校:</div>
-            <div v-show="!school_name_change" class="value">{{ school_name }}</div>
-            <input v-show="school_name_change" v-model="school_name" />
-            <x-button @click="changeSchoolName" skin="condensed" class="change-button">
-              <x-label v-if="!school_name_change">修改</x-label>
+            <div class="name">本机所属学校ID:</div>
+            <div v-show="!school_id_change" class="value">{{ school_id }}</div>
+            <input v-show="school_id_change" v-model="school_id" />
+            <x-button @click="changeSchoolID" skin="condensed" class="change-button">
+              <x-label v-if="!school_id_change">修改</x-label>
               <x-label v-else>确定</x-label>
             </x-button>
           </div>
           <div class="item">
-            <div class="name">上传API位置:</div>
+            <div class="name">识别服务器地址:</div>
             <div v-show="!custom_api_change" class="value">{{ custom_api }}</div>
             <input v-show="custom_api_change" v-model="custom_api" />
             <x-button @click="changeCustomApi" skin="condensed" class="change-button">
@@ -90,6 +90,7 @@
 
 <script>
 import { remote } from "electron";
+import apis from "../libs/api";
 
 export default {
   name: "log-page",
@@ -97,8 +98,8 @@ export default {
     return {
       scanner_id: "",
       scanner_id_change: false,
-      school_name: "",
-      school_name_change: false,
+      school_id: "",
+      school_id_change: false,
       scan_qr_code_local: "",
       folder_path: "",
       keep_uncompressed: true,
@@ -125,16 +126,32 @@ export default {
         this.scanner_id_change = true;
       }
     },
-    async changeSchoolName() {
-      if (this.school_name_change) {
+    async changeSchoolID() {
+      if (this.school_id_change) {
         await this.$db.update(
-          { key: "school_name" },
-          { value: this.school_name, key: "school_name" }
+          { key: "school_id" },
+          { value: this.school_id, key: "school_id" }
         );
         await this.refreshValue();
-        this.school_name_change = false;
+        
+        // 更新学校与扫描仪对应关系
+        // TODO: raise prompts
+        if (this.scanner_id && this.school_id) {
+            try {
+                const res = await apis.updateScannerInfo(this.school_id, this.scanner_id);
+                await this.$db.update(
+                    { key: "school_name" },
+                    { value: res.data.school.school_name, key: "school_name" }
+                );
+                await this.refreshValue();
+            } catch(e) {
+                console.log(e);
+            }
+        }
+        
+        this.school_id_change = false;
       } else {
-        this.school_name_change = true;
+        this.school_id_change = true;
       }
     },
     async changeFolderPath() {
@@ -197,7 +214,7 @@ export default {
     async refreshValue() {
       this.scanner_id = (await this.$db.findOne({ key: "scanner_id" })).value;
       this.custom_api = (await this.$db.findOne({ key: "custom_api" })).value;
-      this.school_name = (await this.$db.findOne({ key: "school_name" })).value;
+      this.school_id = (await this.$db.findOne({ key: "school_id" })).value;
       this.folder_path = (await this.$db.findOne({ key: "folder_path" })).value;
       this.keep_log = (await this.$db.findOne({ key: "keep_log" })).value;
       this.scan_qr_code_local = (
