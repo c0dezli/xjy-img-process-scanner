@@ -1,26 +1,3 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>新教育平台 扫描仪配置 v1.0</title>
-    <% if (htmlWebpackPlugin.options.nodeModules) { %>
-    <!-- Add `node_modules/` to global paths so `require` works properly in development -->
-    <script>
-      require('module').globalPaths.push('<%= htmlWebpackPlugin.options.nodeModules.replace(/\\/g, '\\\\') %>')
-    </script>
-    <% } %>
-    
-    <!-- Set `__static` path to static files in production -->
-    <script>
-        window.__static = require("path")
-          .join(__dirname, "/static")
-          .replace(/\\/g, "\\\\");
-    </script>
-    <!-- webpack builds are automatically injected -->
-
-    <!-- Import Xel Framework -->
-    <script src="static/xel.min.js"></script>
-    <style>
 
 /*
  * @copyright
@@ -1487,11 +1464,3 @@ xel-codeview {
 :host(xel-app) #setup-view h3 x-icon {
   color: hsl(var(--accent-color-h), var(--accent-color-s), var(--accent-color-l));
 }
-
-    </style>
-
-  </head>
-  <body>
-    <div id="app"></div>
-  </body>
-</html>

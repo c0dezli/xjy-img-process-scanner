@@ -29,10 +29,10 @@ export const uploadFile = async (file_path) => {
 
   try {
     // scanner_id
-    const scanner_id = await db.findOne({ key: "scanner_id" });
+    const scanner_id = (await db.findOne({ key: "scanner_id" })).value;
 
     // school_id
-    const school_id = await db.findOne({ key: "school_id" });
+    const school_id = (await db.findOne({ key: "school_id" })).value;
       
     // Upload file
     await apis.scannerUpload(form_data, school_id, scanner_id);

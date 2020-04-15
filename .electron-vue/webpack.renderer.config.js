@@ -134,7 +134,8 @@ let rendererConfig = {
   resolve: {
     alias: {
       '@': path.join(__dirname, '../src/renderer'),
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      'static':path.resolve(__dirname, '../static')
     },
     extensions: ['.js', '.vue', '.json', '.css', '.node']
   },
@@ -162,18 +163,23 @@ if (process.env.NODE_ENV === 'production') {
     new MinifyPlugin(),
     new CopyWebpackPlugin([
       {
-        from: path.join(__dirname, '../static'),
-        to: path.join(__dirname, '../dist/electron/static'),
-        ignore: ['.*']
-      }
+        from: path.join(__dirname, "../static"),
+        to: path.join(__dirname, "../dist/electron/static"),
+        ignore: [".*"],
+      },
     ]),
     new webpack.DefinePlugin({
-      'process.env.NODE_ENV': '"production"'
+      "process.env.NODE_ENV": '"production"',
+    }),
+    new webpack.DefinePlugin({
+      __static: require("path")
+        .join(__dirname, "/static")
+        .replace(/\\/g, "\\\\"),
     }),
     new webpack.LoaderOptionsPlugin({
-      minimize: true
+      minimize: true,
     })
-  )
+  );
 }
 
 module.exports = rendererConfig
