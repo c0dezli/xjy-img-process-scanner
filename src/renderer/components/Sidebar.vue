@@ -29,29 +29,52 @@
         </router-link>
 
         <br />
-        <p>版本： 1.0.0</p>
-        <p>更新日期：2020/02/08</p>
+        <p>版本： 1.1.0</p>
+        <p>更新日期：2020/04/15</p>
         <p>Electron版本：{{ electron }}</p>
         <p>Node版本：{{ node }}</p>
         <p>Vue版本：{{ vue }}</p>
         <p>运行平台：{{ platform }}</p>
+        
+        <x-button @click="checkApp">检查更新</x-button>
+        <p style="color:red"  v-html="update_text"></p>
+
       </section>
     </nav>
   </div>
 </template>
 
 <script>
+import apis from "../libs/api";
+
 export default {
   name: "side-bar",
   data() {
     return {
+      version_num: '1.1.0',
       electron: process.versions.electron,
       name: this.$route.name,
       node: process.versions.node,
       path: this.$route.path,
       platform: require("os").platform(),
-      vue: require("vue/package.json").version
+      vue: require("vue/package.json").version,
+      update_text: ''
     };
+  },
+  methods: {
+    async checkApp() {
+        const res = await apis.checkApp();
+        if (res.data.version_num !== this.version_num)
+            this.update_text = `有新版本${res.data.version_num} <br> 请前往${res.data.download_address}下载`;
+        else 
+            this.update_text = `已是最新版本`;
+
+    },
+  },
+  async created(){
+        const res = await apis.checkApp();
+        if (res.data.version_num !== this.version_num)
+            this.update_text = `有新版本${res.data.version_num} <br> 请前往${res.data.download_address}下载`;
   }
 };
 </script>

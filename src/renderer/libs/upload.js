@@ -7,6 +7,7 @@ import apis from "./api";
 const constractForm = async (file_path) => {
   const file_path_obj = path.parse(file_path);
 
+    console.log(file_path_obj);
   const file = new File(
     [fs.readFileSync(file_path)],
     file_path_obj.name,

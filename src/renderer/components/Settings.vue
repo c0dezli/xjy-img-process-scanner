@@ -76,7 +76,9 @@
           <div class="item">
             <x-button style="margin-right:20px" @click="clearLog">清空日志</x-button>
 
-            <x-button @click="refresh">刷新程序</x-button>
+            <x-button style="margin-right:20px" @click="refresh">刷新程序</x-button>
+
+            <x-button @click="clearFile"><b style="color:red">！清空本地图片！</b></x-button>
            
           </div>
            <p>
@@ -91,6 +93,9 @@
 <script>
 import { remote } from "electron";
 import apis from "../libs/api";
+import fs from "fs";
+import path from "path";
+
 
 export default {
   name: "log-page",
@@ -228,6 +233,22 @@ export default {
       const log_length = (await this.$db.find({ type: "file_record" })).length;
       this.$db.remove({ type: "file_record" }, { multi: true });
       this.clear_log = `清除了${log_length}条日志`;
+    },
+    async clearFile() {
+      this.folder_path = (await this.$db.findOne({ key: "folder_path" })).value;
+      let file_count = 0;
+
+      fs.readdir(this.folder_path, (err, files) => {
+        if (err) throw err;
+
+        for (const file of files) {
+          fs.unlink(path.join(this.folder_path, file), () => {});
+        }
+      });
+      
+      file_count += 1;
+      this.clear_log = `清除了${file_count}个文件`;
+
     }
   }
 };
