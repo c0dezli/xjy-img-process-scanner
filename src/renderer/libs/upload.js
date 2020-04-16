@@ -7,10 +7,9 @@ import apis from "./api";
 const constractForm = async (file_path) => {
   const file_path_obj = path.parse(file_path);
 
-    console.log(file_path_obj);
   const file = new File(
     [fs.readFileSync(file_path)],
-    file_path_obj.name,
+    file_path_obj.base,
     { type: `image/jpg` } // what I upload is image.
   );
 
@@ -27,14 +26,12 @@ const constractForm = async (file_path) => {
 export const uploadFile = async (file_path) => {
   console.log("Start to upload", file_path);
   const form_data = await constractForm(file_path);
-
-  try {
-    // scanner_id
-    const scanner_id = (await db.findOne({ key: "scanner_id" })).value;
-
-    // school_id
-    const school_id = (await db.findOne({ key: "school_id" })).value;
+  // scanner_id
+  const scanner_id = (await db.findOne({ key: "scanner_id" })).value;
+  // school_id
+  const school_id = (await db.findOne({ key: "school_id" })).value;
       
+  try {
     // Upload file
     await apis.scannerUpload(form_data, school_id, scanner_id);
 
@@ -53,6 +50,17 @@ export const uploadFile = async (file_path) => {
       { multi: false }
     );
   } catch (err) {
-    console.log(err);
+    // 如果上传失败，则从系统中删除此文件的log并重新上传
+    await db.remove(
+      { compressed_file_path: file_path },
+      {
+        $set: {
+          uploaded: true,
+          uploaded_time: Date.now(),
+        },
+      },
+      { multi: false }
+    );
+    console.log("Upload Failed!!!!!!", file_path);
   }
 };

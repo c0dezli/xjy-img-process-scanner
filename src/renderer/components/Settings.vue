@@ -243,10 +243,10 @@ export default {
 
         for (const file of files) {
           fs.unlink(path.join(this.folder_path, file), () => {});
+          file_count += 1;
         }
       });
       
-      file_count += 1;
       this.clear_log = `清除了${file_count}个文件`;
 
     }
