@@ -203,6 +203,9 @@ export default {
     },
     async changeCustomApi() {
       if (this.custom_api_change) {
+          if (this.custom_api.endsWith('/')){
+              this.custom_api = this.custom_api.slice(0, this.custom_api.length - 1)
+          }
         await this.$db.update(
           { key: "custom_api" },
           { value: this.custom_api, key: "custom_api" }

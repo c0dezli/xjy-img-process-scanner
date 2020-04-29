@@ -30,7 +30,7 @@ export const uploadFile = async (file_path) => {
   const scanner_id = (await db.findOne({ key: "scanner_id" })).value;
   // school_id
   const school_id = (await db.findOne({ key: "school_id" })).value;
-      
+
   try {
     // Upload file
     await apis.scannerUpload(form_data, school_id, scanner_id);
@@ -49,6 +49,10 @@ export const uploadFile = async (file_path) => {
       },
       { multi: false }
     );
+
+    // Log
+    fs.unlink(file_path, () => {});
+    console.log("Removed", file_path);
   } catch (err) {
     // 如果上传失败，则从系统中删除此文件的log并重新上传
     await db.remove(
@@ -62,5 +66,6 @@ export const uploadFile = async (file_path) => {
       { multi: false }
     );
     console.log("Upload Failed!!!!!!", file_path);
+    uploadFile(file_path);
   }
 };

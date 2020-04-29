@@ -53,15 +53,15 @@ export default {
 
       // scan_qr_code_local
       const scan_qr_code_local = await this.$db.findOne({
-        key: "scan_qr_code_local"
+        key: "scan_qr_code_local",
       });
       if (!scan_qr_code_local) {
-        await this.$db.insert({ value: true, key: "scan_qr_code_local" });
+        await this.$db.insert({ value: false, key: "scan_qr_code_local" });
       }
 
       // keep_uncompressed
       const keep_uncompressed = await this.$db.findOne({
-        key: "keep_uncompressed"
+        key: "keep_uncompressed",
       });
       if (!keep_uncompressed) {
         await this.$db.insert({ value: true, key: "keep_uncompressed" });
@@ -69,7 +69,7 @@ export default {
 
       // keep_log
       const keep_log = await this.$db.findOne({
-        key: "keep_log"
+        key: "keep_log",
       });
       if (!keep_log) {
         await this.$db.insert({ value: 4, key: "keep_log" });
@@ -77,14 +77,13 @@ export default {
 
       // custom_api
       const custom_api = await this.$db.findOne({
-        key: "custom_api"
+        key: "custom_api",
       });
       if (!custom_api) {
         await this.$db.insert({ value: "", key: "custom_api" });
       }
-    }
-
-  }
+    },
+  },
 };
 </script>
 

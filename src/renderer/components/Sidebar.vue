@@ -29,8 +29,8 @@
         </router-link>
 
         <br />
-        <p>版本： 1.1.0</p>
-        <p>更新日期：2020/04/15</p>
+        <p>版本： 1.2.0</p>
+        <p>更新日期：2020/04/29</p>
         <p>Electron版本：{{ electron }}</p>
         <p>Node版本：{{ node }}</p>
         <p>Vue版本：{{ vue }}</p>
@@ -51,7 +51,7 @@ export default {
   name: "side-bar",
   data() {
     return {
-      version_num: '1.1.0',
+      version_num: '1.2.0',
       electron: process.versions.electron,
       name: this.$route.name,
       node: process.versions.node,
