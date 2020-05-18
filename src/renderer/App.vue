@@ -64,7 +64,7 @@ export default {
         key: "keep_uncompressed",
       });
       if (!keep_uncompressed) {
-        await this.$db.insert({ value: true, key: "keep_uncompressed" });
+        await this.$db.insert({ value: false, key: "keep_uncompressed" });
       }
 
       // keep_log
